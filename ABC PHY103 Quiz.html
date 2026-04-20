@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHY 103 — Standard Mock | Toppers Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0f1523;
+    --card: #131c2e;
+    --border: #1a2640;
+    --accent: #00cfff;
+    --accent2: #ff6b35;
+    --green: #00e676;
+    --red: #ff4444;
+    --gold: #ffd54f;
+    --text: #dde6f5;
+    --muted: #5a7090;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,207,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(255,107,53,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── LAYOUT ── */
+  .screen {
+    position: relative; z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 18px 80px;
+    display: none;
+  }
+  .screen.active { display: block; }
+
+  /* ── HEADER ── */
+  .logo-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .timer-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--gold);
+    background: rgba(255,213,79,0.1);
+    border: 1px solid rgba(255,213,79,0.3);
+    padding: 6px 16px; border-radius: 20px;
+    letter-spacing: 1px;
+    display: none;
+  }
+  .timer-badge.visible { display: block; }
+  .timer-badge.warning { color: var(--red); border-color: rgba(255,68,68,0.5); background: rgba(255,68,68,0.08); animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  /* ── REGISTRATION ── */
+  .reg-hero { text-align: center; margin-bottom: 40px; }
+  .reg-tag {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); border: 1px solid rgba(0,207,255,0.25);
+    padding: 5px 16px; border-radius: 20px; margin-bottom: 16px;
+  }
+  .reg-hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(24px,5vw,38px); font-weight: 800;
+    line-height: 1.1; letter-spacing: -1px; margin-bottom: 10px;
+  }
+  .reg-hero h1 em { color: var(--accent); font-style: normal; }
+  .reg-hero p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  .info-strip {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center; margin: 20px 0 36px;
+  }
+  .info-pill {
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--muted); background: var(--card);
+    border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 20px;
+  }
+  .info-pill span { color: var(--text); font-weight: 500; }
+
+  /* FORM */
+  .form-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 28px;
+    position: relative; overflow: hidden;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input, select {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  input::placeholder { color: var(--muted); }
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,207,255,0.1);
+  }
+  input.error { border-color: var(--red); }
+
+  .error-msg { font-size: 11px; color: var(--red); margin-top: 4px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* BUTTONS */
+  .btn {
+    border: none; border-radius: 12px; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 0.5px;
+    padding: 14px 24px;
+    transition: all 0.2s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%);
+    color: #000; width: 100%; margin-top: 8px; padding: 16px;
+    font-size: 15px;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    flex: 1;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger {
+    background: transparent;
+    border: 1.5px solid rgba(255,107,53,0.4);
+    color: var(--accent2); flex: 1;
+  }
+  .btn-danger:hover { border-color: var(--accent2); background: rgba(255,107,53,0.08); }
+
+  /* ── QUIZ SCREEN ── */
+  .progress-wrap { margin-bottom: 22px; }
+  .progress-top {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--muted); margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 3px; background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .score-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 24px;
+  }
+  .score-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 8px; text-align: center;
+  }
+  .score-pill .val {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 800;
+  }
+  .score-pill .lbl { font-size: 9px; color: var(--muted); letter-spacing: 1.5px; margin-top: 3px; }
+  .score-pill.c .val { color: var(--green); }
+  .score-pill.w .val { color: var(--red); }
+  .score-pill.s .val { color: var(--muted); }
+  .score-pill.p .val { color: var(--gold); }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 26px 24px;
+    margin-bottom: 18px;
+    position: relative; overflow: hidden;
+    animation: slideIn 0.35s ease both;
+  }
+  .q-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  @keyframes slideIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+
+  .q-num {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 14px; line-height: 1.75;
+    color: var(--text); margin-bottom: 22px;
+    white-space: pre-line;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 9px; }
+
+  .option {
+    display: flex; align-items: flex-start; gap: 13px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    padding: 13px 15px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: var(--text); line-height: 1.5;
+    text-align: left;
+    transition: all 0.18s ease;
+    width: 100%;
+  }
+  .option:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(0,207,255,0.05);
+    transform: translateX(3px);
+  }
+  .opt-lbl {
+    flex-shrink: 0;
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+    color: var(--muted); transition: all 0.18s;
+  }
+  .option.sel { border-color: var(--accent); background: rgba(0,207,255,0.07); }
+  .option.sel .opt-lbl { background: var(--accent); color: #000; }
+  .option.correct { border-color: var(--green); background: rgba(0,230,118,0.07); }
+  .option.correct .opt-lbl { background: var(--green); color: #000; }
+  .option.wrong { border-color: var(--red); background: rgba(255,68,68,0.07); }
+  .option.wrong .opt-lbl { background: var(--red); color: #fff; }
+  .option.show-ans { border-color: rgba(0,230,118,0.4); }
+  .option.show-ans .opt-lbl { background: rgba(0,230,118,0.2); color: var(--green); }
+  .option:disabled { cursor: default; }
+
+  .feedback {
+    display: none; margin-top: 14px;
+    padding: 11px 14px; border-radius: 9px;
+    font-size: 12px; line-height: 1.5;
+  }
+  .feedback.show { display: block; animation: fadeUp 0.25s ease; }
+  .feedback.ok { background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.25); color: var(--green); }
+  .feedback.err { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.25); color: #ff8080; }
+
+  .nav-bar { display: flex; gap: 10px; }
+
+  /* ── RESULTS ── */
+  #results-screen { text-align: center; }
+
+  .result-hero { margin-bottom: 32px; }
+  .grade-circle {
+    width: 150px; height: 150px; border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 3px solid var(--accent);
+    background: radial-gradient(circle, rgba(0,207,255,0.1) 0%, transparent 70%);
+    box-shadow: 0 0 50px rgba(0,207,255,0.15);
+  }
+  .grade-pct { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; color: var(--accent); }
+  .grade-sub { font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+  .result-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .result-desc { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+  .result-grid {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 12px; margin-bottom: 28px;
+  }
+  .result-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 12px;
+  }
+  .result-box .n { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; }
+  .result-box .t { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; margin-top: 4px; }
+  .result-box.c .n { color: var(--green); }
+  .result-box.w .n { color: var(--red); }
+  .result-box.s .n { color: var(--muted); }
+
+  .time-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 20px;
+    margin-bottom: 28px; display: flex;
+    align-items: center; justify-content: space-between;
+  }
+  .time-box .label { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .time-box .value { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--gold); }
+
+  .submit-status {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 16px; min-height: 20px;
+  }
+  .submit-status.sending { color: var(--accent); }
+  .submit-status.done { color: var(--green); }
+  .submit-status.fail { color: var(--red); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  /* LOADING overlay */
+  #loading-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(7,9,15,0.85);
+    display: none;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+  }
+  #loading-overlay.show { display: flex; }
+  .spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-overlay p { font-size: 13px; color: var(--muted); }
+
+  @media (max-width: 520px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .score-strip { grid-template-columns: repeat(2,1fr); }
+    .result-grid { grid-template-columns: 1fr; }
+    .form-card { padding: 22px 16px; }
+    .q-card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Submitting your results...</p>
+</div>
+
+<!-- ══════════════ REGISTRATION SCREEN ══════════════ -->
+<div id="reg-screen" class="screen active">
+  <div class="logo-bar">
+    <span class="logo-text">Medicathron's PHY103 class</span>
+  </div>
+
+  <div class="reg-hero">
+    <div class="reg-tag">PHY 103 · 2025/2026 Session</div>
+    <h1>Standard Mock<br><em>Examination</em></h1>
+    <p>Tutor: Medicathron &nbsp;·&nbsp; Complete all fields before you begin</p>
+  </div>
+
+  <div class="info-strip">
+    <div class="info-pill">Questions: <span>50</span></div>
+    <div class="info-pill">Duration: <span>35 mins</span></div>
+    <div class="info-pill">Date: <span>18-04-2026</span></div>
+    <div class="info-pill">Mode: <span>Quiz / Flashcard</span></div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Full Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Adaeze Titilope Chimamanda" autocomplete="name">
+        <span class="error-msg" id="err-name">Please enter your full name</span>
+      </div>
+      <div class="form-group">
+        <label>Matric Number</label>
+        <input type="text" id="f-matric" placeholder="e.g. 221144" autocomplete="off">
+        <span class="error-msg" id="err-matric">Required</span>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="f-phone" placeholder="e.g. 08012345678" autocomplete="tel">
+        <span class="error-msg" id="err-phone">Required</span>
+      </div>
+      <div class="form-group full">
+        <label>Department</label>
+        <input type="text" id="f-dept" placeholder="e.g. Mechanical Engineering" autocomplete="organization">
+        <span class="error-msg" id="err-dept">Required</span>
+      </div>
+      <div class="form-group full">
+        <label>Mode</label>
+        <select id="f-mode">
+          <option value="quiz">🎯 Quiz Mode — Answer & get instant feedback</option>
+          <option value="flashcard">🃏 Flashcard Mode — Reveal answers</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="beginQuiz()">START EXAM →</button>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ SCREEN ══════════════ -->
+<div id="quiz-screen" class="screen">
+  <div class="logo-bar">
+    <span class="logo-text">PHY 103 Mock</span>
+    <div class="timer-badge visible" id="timer-display">00:00</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span id="q-counter">Q1 / 50</span>
+      <span id="q-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:2%"></div></div>
+  </div>
+
+  <div class="score-strip">
+    <div class="score-pill c"><div class="val" id="sc-correct">0</div><div class="lbl">CORRECT</div></div>
+    <div class="score-pill w"><div class="val" id="sc-wrong">0</div><div class="lbl">WRONG</div></div>
+    <div class="score-pill s"><div class="val" id="sc-skip">0</div><div class="lbl">SKIPPED</div></div>
+    <div class="score-pill p"><div class="val" id="sc-pct">0%</div><div class="lbl">SCORE</div></div>
+  </div>
+
+  <div class="q-card" id="q-card">
+    <div class="q-num" id="q-num-lbl">QUESTION 01</div>
+    <div class="q-text" id="q-text-el"></div>
+    <div class="options" id="options-el"></div>
+    <div class="feedback" id="feedback-el"></div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="btn btn-outline" id="btn-prev" onclick="nav(-1)">← Prev</button>
+    <button class="btn btn-outline" id="btn-next" onclick="nav(1)">Next →</button>
+    <button class="btn btn-danger" onclick="confirmFinish()">Submit</button>
+  </div>
+</div>
+
+<!-- ══════════════ RESULTS SCREEN ══════════════ -->
+<div id="results-screen" class="screen">
+  <div class="logo-bar">
+    <span class="logo-text">Toppers Tutorial</span>
+  </div>
+
+  <div class="result-hero">
+    <div class="grade-circle">
+      <div class="grade-pct" id="r-pct">--%</div>
+      <div class="grade-sub">FINAL SCORE</div>
+    </div>
+    <div class="result-title" id="r-title">Results</div>
+    <div class="result-desc" id="r-desc"></div>
+  </div>
+
+  <div class="result-grid">
+    <div class="result-box c"><div class="n" id="r-correct">0</div><div class="t">CORRECT</div></div>
+    <div class="result-box w"><div class="n" id="r-wrong">0</div><div class="t">WRONG</div></div>
+    <div class="result-box s"><div class="n" id="r-skip">0</div><div class="t">SKIPPED</div></div>
+  </div>
+
+  <div class="time-box">
+    <span class="label">⏱ TIME SPENT</span>
+    <span class="value" id="r-time">--:--</span>
+  </div>
+
+  <div class="submit-status" id="submit-status">Sending results to Toppers Tutorial records...</div>
+
+  <div class="nav-bar" style="justify-content:center; flex-wrap:wrap; gap:12px;">
+    <button class="btn btn-primary" onclick="resetAll()" style="flex:1;min-width:180px;max-width:300px;">Try Again</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// ► CONFIGURATION — loaded from localStorage (set via setup screen)
+// ════════════════════════════════════════════
+let SHEET_URL = localStorage.getItem('phy103_sheet_url') || "";
+
+// ════════════════════════════════════════════
+// ► QUESTIONS DATA
+// ════════════════════════════════════════════
+const questions = [
+  { q: "Two containers of gas are connected to a third container acting as a thermometer. After a long time, all three show the same temperature reading. Which fundamental law of thermodynamics does this demonstrate?", opts: ["A and B have different temperatures", "A and B are in thermal equilibrium with each other", "Heat flows from C to both A and B simultaneously", "The internal energy of C is zero"], ans: 1 },
+  { q: "A student lists four statements about temperature scales:\nI) The ice point is 273.15 K on the Kelvin scale.\nII) The triple point of water is 273.16 K.\nIII) The Fahrenheit steam point is 212°F.\nIV) A temperature difference of 45°C equals a difference of 81°F.\nHow many of these statements are correct?", opts: ["I and II only", "I, II and III only", "I, II, III and IV", "II and IV only"], ans: 2 },
+  { q: "A hot iron rod is placed near a cold metal block but they are not touching. Will heat transfer occur between them?", opts: ["Yes, because they are made of metal", "No, because they are at different temperatures", "No, because they are not in thermal contact", "Yes, because of atmospheric pressure"], ans: 2 },
+  { q: "A thermometer is used to confirm that two objects have the same temperature without placing them directly in contact with each other. This procedure is a practical demonstration of which law?", opts: ["Zeroth Law of Thermodynamics", "Second Law of Thermodynamics", "First Law of Thermodynamics", "Third Law of Thermodynamics"], ans: 0 },
+  { q: "A nurse records a patient\'s temperature as 32°F. What is this temperature on the Celsius scale?", opts: ["0°C", "32°C", "23°F", "212°F"], ans: 0 },
+  { q: "A scientist notices that the ice point and the triple point of water are not exactly the same value. What is the PRIMARY reason for this small but important difference?", opts: ["Differences in the chemical type of water used", "The effect of atmospheric pressure and dissolved air on the ice point", "Changes in boiling points at different altitudes", "Inaccuracies in the thermometers used"], ans: 1 },
+  { q: "Refrigerator B is kept exactly 45°F warmer than Refrigerator A. If you were to measure this same gap using the Celsius scale, what would it be?", opts: ["25°C", "7.2°C", "8.1°C", "81°C"], ans: 0 },
+  { q: "A biological sample storage unit is maintained at 253 K. A technician records this in Celsius. What is the correct value?", opts: ["-20°C", "-26.15°C", "-253°C", "20°C"], ans: 0 },
+  { q: "Physicists describe Absolute Zero as a fundamental limit rather than just a very cold temperature. Which statement correctly describes what happens at 0 K?", opts: ["All kinetic and vibrational molecular motion ceases according to classical mechanics", "The volume and pressure of a mathematically ideal gas would extrapolate to zero", "All known substances transition into a crystalline solid", "The internal energy of a system reaches its maximum possible entropy"], ans: 1 },
+  { q: "A student lists properties of various thermometers. Which of the following is the thermometric property exploited by a liquid-in-glass thermometer?", opts: ["The pressure of the liquid", "The electrical resistance of the glass", "The volume/length of the liquid column", "The spectral emissivity of the glass"], ans: 2 },
+  { q: "A laboratory technician needs a thermometer that can measure up to 300°C reliably. Which of the following thermometers is most appropriate?", opts: ["-200°C to 1000°C (platinum resistance)", "-80°C to 70°C (alcohol)", "-270°C to 2000°C (gas)", "-35°C to 350°C (mercury-in-glass)"], ans: 3 },
+  { q: "A physicist needs to measure the temperature at a very tiny spot on a microchip. Which thermometer is best suited for this because of its very small sensing element?", opts: ["Constant-volume gas thermometer", "Liquid-in-glass thermometer", "Thermoelectric thermometer", "Mercury thermometer"], ans: 2 },
+  { q: "An engineer needs to monitor temperature changes that happen within fractions of a second in an engine. Which thermometer would be LEAST suitable for this purpose?", opts: ["Constant-volume gas thermometer", "Thermoelectric thermometer", "Thermocouple", "Resistance thermometer"], ans: 0 },
+  { q: "A researcher working with superconducting materials needs to measure temperatures close to absolute zero. Which thermometer covers this extreme range?", opts: ["-35°C to 350°C", "-80°C to 70°C", "-270°C to 1500°C", "0°C to 100°C"], ans: 2 },
+  { q: "A metallurgist needs a precise thermometer capable of measuring both very low and very high temperatures in a furnace environment. Which best fits the range -200°C to 1000°C?", opts: ["Platinum resistance thermometer", "Alcohol-in-glass thermometer", "Constant-volume gas thermometer", "Mercury-in-glass thermometer"], ans: 0 },
+  { q: "A structural steel rail has an initial length of 30.00 m at 0°C. Given α = 11 × 10⁻⁶ °C⁻¹, what is the final length when temperature reaches 40°C?", opts: ["30.013 m", "30.130 m", "29.987 m", "30.044 m"], ans: 0 },
+  { q: "A sealed rigid metal container holds a fixed amount of gas. A flame is applied beneath it. Which property of the gas changes and serves as the thermometric indicator in a constant-volume gas thermometer?", opts: ["Length of gas column", "Volume of gas", "Pressure of the gas", "Density of the gas"], ans: 2 },
+  { q: "Two bolts (steel: L=10 mm, α=11×10⁻⁶; brass: L=30 mm, α=19×10⁻⁶) have a 5 µm gap at 27°C. They will touch when ΔT ≈", opts: ["3.7°C", "34.4°C", "19.6°C", "7.4°C"], ans: 0 },
+  { q: "A gas system at constant pressure of 1000 Pa performs 20 kJ of work during isobaric expansion. If the initial volume was 8 m³, what is the final volume?", opts: ["12 m³", "18 m³", "20 m³", "28 m³"], ans: 3 },
+  { q: "A constant-volume gas thermometer is calibrated at −80°C (P = 0.900 atm) and 78°C (P = 1.635 atm). The Celsius value of absolute zero this yields is approximately ________", opts: ["-270°C", "-273.8°C", "-273.15°C", "-300°C"], ans: 1 },
+  { q: "A block of ice is placed on a hot plate. A temperature probe records the temperature every second. What pattern will be observed during the melting process?", opts: ["Temperature rises rapidly throughout", "Temperature drops slightly then rises", "Temperature stays constant until all ice has melted", "Temperature first rises then drops back down"], ans: 2 },
+  { q: "A 0.05 kg metal ingot heated to 200°C is dropped into 0.400 kg of water at 20°C, reaching equilibrium at 22.4°C (c_water = 4186 J kg⁻¹ °C⁻¹). The specific heat of the metal is approximately _______", opts: ["125 J kg⁻¹ K⁻¹", "253 J kg⁻¹ K⁻¹", "453 J kg⁻¹ K⁻¹", "837 J kg⁻¹ K⁻¹"], ans: 2 },
+  { q: "Two materials X and Y receive the same amount of heat energy. Material X shows a large temperature rise while material Y barely changes temperature. What can you conclude?", opts: ["X has higher specific heat capacity than Y", "Y has higher specific heat capacity than X", "X conducts heat more efficiently than Y", "Y has a higher latent heat than X"], ans: 1 },
+  { q: "Water boils at 100°C, yet steam burns are far more dangerous than burns from boiling water at the same temperature. Which thermodynamic concept best explains this?", opts: ["Steam has lower internal energy than water", "Solid-to-liquid transition requires more energy than liquid-to-gas", "Fusion occurs at a much higher temperature threshold", "Vaporization requires molecules to fully overcome intermolecular forces, storing enormous extra energy"], ans: 3 },
+  { q: "Liquid flows through a heated tube at 0.150 kg/min (25 W, ΔT=2.2°C); then 0.2318 kg/min (37.8 W, same ΔT). Specific heat of the liquid?", opts: ["2100 J kg⁻¹ K⁻¹", "3600 J kg⁻¹ K⁻¹", "4200 J kg⁻¹ K⁻¹", "4800 J kg⁻¹ K⁻¹"], ans: 2 },
+  { q: "From the same tube experiment above, the rate of heat loss from the tube is:", opts: ["0.9 W", "2.1 W", "3.5 W", "5.0 W"], ans: 2 },
+  { q: "A textbook defines internal energy as the total microscopic energy of a system. A student argues that a moving train has high internal energy because it is moving fast. Is the student correct?", opts: ["Yes, translational motion adds to internal energy", "Yes, the vibration of train parts counts", "No, internal energy excludes the bulk kinetic energy of the whole system", "No, only potential energy is excluded"], ans: 2 },
+  { q: "A heat engine completes one full cycle and returns exactly to its starting state. A technician measures the heat added and work output. What relationship must hold?", opts: ["Q = -W", "Q = 0", "W = 0", "Q = W"], ans: 3 },
+  { q: "A system experiences a decrease in internal energy of 500 J. If 200 J of work is performed ON the system by the surroundings, the resulting heat transfer (Q) is ______", opts: ["Q = -300 J", "Q = +300 J", "Q = -700 J", "Q = +700 J"], ans: 2 },
+  { q: "An industrial gas piston is compressed from 9.0 m³ to 2.0 m³ at constant pressure of 0.8 atm. How much work did the gas do?", opts: ["-5.66 × 10⁵ J", "+5.66 × 10⁵ J", "-5.66 × 10⁴ J", "+5.66 × 10⁴ J"], ans: 0 },
+  { q: "During the same compression above, the gas lost 400 J of heat through the cylinder walls. What is the change in internal energy ΔEint of the gas?", opts: ["-4.0 × 10² J", "+5.65 × 10⁵ J", "-5.66 × 10⁵ J", "-6.06 × 10⁵ J"], ans: 1 },
+  { q: "2500 J of heat is added to 2 moles of an ideal monoatomic gas (initially at 300 K) while the gas performs 5000 J of work. What is the change in internal energy?", opts: ["-7500 J", "-2500 J", "2500 J", "7500 J"], ans: 1 },
+  { q: "An X-ray tube fires 10¹⁸ electrons/s at 2×10⁶ m/s at a tungsten target (m=0.2 kg, c=500 J kg⁻¹ K⁻¹). Only 98% of electron KE converts to heat. How long for a 50°C temperature rise?", opts: ["1870 s", "1500 s", "2780 s", "5210 s"], ans: 0 },
+  { q: "A perfectly insulated balloon filled with ideal gas is allowed to expand freely. Which statement correctly describes the outcome?", opts: ["Temperature rises as molecules speed up", "Temperature drops and internal energy decreases", "Temperature stays the same, internal energy unchanged", "Pressure rises as volume increases"], ans: 1 },
+  { q: "1 mole of ideal gas expands isothermally at 273 K from 3.0 L to 10.0 L. Work done by the gas?", opts: ["2370 J", "3720 J", "7320 J", "2730 J"], ans: 3 },
+  { q: "Two students debate whether the work done by a gas depends only on its start and end states. One says the path matters too. Who is correct, and why?", opts: ["Only the initial and final states matter — work is a state function", "Only the path matters — states are irrelevant", "Only initial and final states matter, path is irrelevant", "Both the initial/final states AND the path taken determine the work done"], ans: 3 },
+  { q: "A thermodynamics exam question asks students to identify which quantity is NOT a state variable of a system. Which answer is correct?", opts: ["Pressure, P", "Volume, V", "Temperature, T", "Heat, Q"], ans: 3 },
+  { q: "During a process, a gas expands and does work, yet its temperature does not change at all. No internal energy accumulates. Which thermodynamic process fits this description perfectly?", opts: ["Adiabatic", "Isochoric", "Isobaric", "Isothermal"], ans: 3 },
+  { q: "Using the kinetic theory expression P = ⅓(N/V)μ², which single change would cause gas pressure to increase while all other factors remain constant?", opts: ["Increasing the number of molecules per unit volume", "Decreasing the mean square speed of molecules", "Increasing the size of the container", "Cooling the gas to a lower absolute temperature"], ans: 0 },
+  { q: "The average translational kinetic energy per molecule of an ideal gas equals:", opts: ["½kᵦT", "kᵦT", "3/2 kᵦT", "3kᵦT"], ans: 2 },
+  { q: "A tank (0.3 m³) holds 2.0 mol of helium at 20°C. The total translational kinetic energy of the gas molecules is approximately _____", opts: ["3.65 × 10³ J", "7.30 × 10³ J", "1.46 × 10⁴ J", "2.19 × 10⁴ J"], ans: 0 },
+  { q: "A student asks: \'If I heat a gas at constant pressure and at constant volume by the same amount, why does the constant-pressure case need more heat?\' What is the correct explanation?", opts: ["At constant pressure the gas expands and must do work, requiring extra energy input", "Less heat is needed at constant pressure than constant volume", "The temperature change is smaller at constant pressure", "Internal energy changes more at constant volume"], ans: 0 },
+  { q: "One mole of an ideal monoatomic gas at 300 K gains 500 J of heat at constant volume. What is the new temperature?", opts: ["320 K", "310 K", "360 K", "340 K"], ans: 3 },
+  { q: "For a monoatomic ideal gas, the ratio of work done to heat added during an isobaric process is:", opts: ["1/3", "2/5", "2/3", "5/7"], ans: 1 },
+  { q: "Which equation correctly expresses the relationship between temperature and volume during an adiabatic process?", opts: ["TV = constant", "TV^(1-γ) = constant", "TV^(γ−1) = constant", "T^γV = constant"], ans: 2 },
+  { q: "Two moles of ideal gas (γ=1.40) expand adiabatically from Pᵢ=5.00 atm, Vᵢ=12.0 L to Vf=30.0 L. The final pressure Pf is approximately:", opts: ["0.77 atm", "1.39 atm", "2.50 atm", "3.15 atm"], ans: 1 },
+  { q: "A physics student ranks four thermodynamic processes by how much work the gas does during expansion (same initial state and same volume change). What is the correct order from least to most work?", opts: ["Isochoric < Isothermal < Isobaric < Adiabatic", "Isothermal < Adiabatic < Isobaric < Isochoric", "Isobaric < Isothermal < Adiabatic < Isochoric", "Isochoric = 0 < Adiabatic < Isothermal < Isobaric"], ans: 3 },
+  { q: "A student claims that heat and work are both state functions because they transfer energy. Why is this claim incorrect?", opts: ["Heat and work both depend on path, not just initial and final states", "Only heat is path-dependent; work is a state function", "Their difference — internal energy — is path-independent, but Q and W individually are not", "The sum of heat and work always equals zero"], ans: 2 },
+  { q: "For a monoatomic ideal gas (2 moles, 300 K): 2500 J of heat is supplied while the gas does 5000 J of work on surroundings. What is the closest value of the final internal energy of the gas?", opts: ["2500 J", "4986 J", "7486 J", "9970 J"], ans: 1 },
+  { q: "A metrologist needs to calibrate a new digital resistance thermometer in the laboratory. Which thermometer should be used as the primary standard reference?", opts: ["Alcohol-in-glass thermometer", "Mercury-in-glass thermometer", "Constant-volume gas thermometer", "Thermocouple"], ans: 2 }
+];
+
+// ════════════════════════════════════════════
+// ► STATE
+// ════════════════════════════════════════════
+const LABELS = ['A','B','C','D'];
+let student = {};
+let mode = 'quiz';
+let answers = [];
+let current = 0;
+let correct = 0, wrong = 0;
+let timerInterval = null;
+let startTime = null;
+let elapsedSeconds = 0;
+
+// ════════════════════════════════════════════
+// ► REGISTRATION
+// ════════════════════════════════════════════
+function beginQuiz() {
+  const name   = document.getElementById('f-name').value.trim();
+  const matric = document.getElementById('f-matric').value.trim();
+  const phone  = document.getElementById('f-phone').value.trim();
+  const dept   = document.getElementById('f-dept').value.trim();
+  mode = document.getElementById('f-mode').value;
+
+  let valid = true;
+  const fields = [{id:'name',val:name},{id:'matric',val:matric},{id:'phone',val:phone},{id:'dept',val:dept}];
+  fields.forEach(f => {
+    const inp = document.getElementById('f-'+f.id);
+    const err = document.getElementById('err-'+f.id);
+    if (!f.val) { inp.classList.add('error'); err.classList.add('show'); valid = false; }
+    else { inp.classList.remove('error'); err.classList.remove('show'); }
+  });
+  if (!valid) return;
+
+  student = { name, matric, phone, dept };
+  answers = new Array(questions.length).fill(null);
+  correct = 0; wrong = 0; current = 0;
+  startTime = Date.now();
+  startTimer();
+
+  show('quiz-screen');
+  renderQ();
+}
+
+// ════════════════════════════════════════════
+// ► TIMER
+// ════════════════════════════════════════════
+function startTimer() {
+  timerInterval = setInterval(() => {
+    elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(elapsedSeconds/60)).padStart(2,'0');
+    const s = String(elapsedSeconds%60).padStart(2,'0');
+    const el = document.getElementById('timer-display');
+    el.textContent = m + ':' + s;
+    // warn after 30 min
+    if (elapsedSeconds >= 1800) el.classList.add('warning');
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec/60), s = sec%60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// ════════════════════════════════════════════
+// ► RENDER QUESTION
+// ════════════════════════════════════════════
+function renderQ() {
+  const q = questions[current];
+  const total = questions.length;
+  const pct = Math.round(((current+1)/total)*100);
+
+  document.getElementById('q-counter').textContent = `Q${current+1} / ${total}`;
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('q-num-lbl').textContent = `QUESTION ${String(current+1).padStart(2,'0')}`;
+  document.getElementById('q-text-el').textContent = q.q;
+
+  const container = document.getElementById('options-el');
+  container.innerHTML = '';
+  const fb = document.getElementById('feedback-el');
+  fb.className = 'feedback';
+  fb.textContent = '';
+
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.disabled = answers[current] !== null;
+    btn.innerHTML = `<span class="opt-lbl">${LABELS[i]}</span><span>${opt}</span>`;
+
+    if (answers[current] !== null) {
+      if (i === q.ans) btn.classList.add(answers[current] === q.ans && i === answers[current] ? 'correct' : 'show-ans');
+      if (i === answers[current] && answers[current] !== q.ans) btn.classList.add('wrong');
+      if (i === answers[current] && answers[current] === q.ans) btn.classList.add('correct');
+    }
+
+    if (mode === 'quiz') {
+      btn.onclick = () => pickAnswer(i);
+    }
+    container.appendChild(btn);
+  });
+
+  if (mode === 'flashcard') {
+    if (answers[current] !== null) {
+      revealFlashcard();
+    } else {
+      const rb = document.createElement('button');
+      rb.className = 'btn btn-outline';
+      rb.style.cssText = 'margin-top:14px;width:100%;';
+      rb.textContent = '👁  Reveal Answer';
+      rb.onclick = () => { answers[current] = q.ans; revealFlashcard(); renderQ(); };
+      container.appendChild(rb);
+    }
+  }
+
+  if (answers[current] !== null && mode === 'quiz') {
+    const ok = answers[current] === q.ans;
+    fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+    fb.textContent = ok
+      ? `✓ Correct! Answer is ${LABELS[q.ans]}.`
+      : `✗ Wrong. Correct answer: ${LABELS[q.ans]} — ${q.opts[q.ans]}`;
+  }
+
+  document.getElementById('btn-prev').disabled = current === 0;
+  updateScores();
+}
+
+function revealFlashcard() {
+  const q = questions[current];
+  document.querySelectorAll('.option').forEach((b,i) => {
+    b.disabled = true;
+    if (i === q.ans) b.classList.add('show-ans');
+  });
+  const fb = document.getElementById('feedback-el');
+  fb.className = 'feedback show ok';
+  fb.textContent = `✓ Answer: ${LABELS[q.ans]} — ${q.opts[q.ans]}`;
+}
+
+function pickAnswer(i) {
+  if (answers[current] !== null) return;
+  const q = questions[current];
+  answers[current] = i;
+  if (i === q.ans) correct++; else wrong++;
+  updateScores();
+  renderQ();
+}
+
+function updateScores() {
+  const answered = answers.filter(a => a !== null).length;
+  const skipped  = questions.length - answered;
+  document.getElementById('sc-correct').textContent = correct;
+  document.getElementById('sc-wrong').textContent   = wrong;
+  document.getElementById('sc-skip').textContent    = skipped;
+  const pct = answered > 0 ? Math.round((correct/answered)*100) : 0;
+  document.getElementById('sc-pct').textContent = pct + '%';
+}
+
+function nav(dir) {
+  current = Math.max(0, Math.min(questions.length-1, current+dir));
+  renderQ();
+}
+
+function confirmFinish() {
+  const unanswered = answers.filter(a => a===null).length;
+  if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+  finishQuiz();
+}
+
+// ════════════════════════════════════════════
+// ► FINISH & RESULTS
+// ════════════════════════════════════════════
+function finishQuiz() {
+  stopTimer();
+  const answered = answers.filter(a => a !== null).length;
+  const skipped  = questions.length - answered;
+  const pct      = answered > 0 ? Math.round((correct/answered)*100) : 0;
+
+  document.getElementById('r-pct').textContent     = pct + '%';
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-wrong').textContent   = wrong;
+  document.getElementById('r-skip').textContent    = skipped;
+  document.getElementById('r-time').textContent    = formatTime(elapsedSeconds);
+
+  let title, desc;
+  if (pct >= 80)      { title = '🏆 Excellent!';    desc = 'Outstanding performance. Medicathron would be proud!'; }
+  else if (pct >= 60) { title = '👍 Good Effort!';  desc = 'Solid showing — review the questions you missed.'; }
+  else if (pct >= 40) { title = '📚 Keep Studying!';desc = 'You\'re getting there. Revisit the thermodynamics notes.'; }
+  else                { title = '💪 Keep Going!';   desc = 'Every attempt makes you stronger. Review & try again!'; }
+
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-desc').textContent  = desc;
+
+  show('results-screen');
+  submitToSheet(pct, skipped);
+}
+
+// ════════════════════════════════════════════
+// ► GOOGLE SHEETS SUBMISSION
+// ════════════════════════════════════════════
+async function submitToSheet(pct, skipped) {
+  const statusEl = document.getElementById('submit-status');
+  statusEl.className = 'submit-status sending';
+  statusEl.textContent = '⏳ Sending results to Medicathron right now...';
+
+  // Build per-question detail string
+  const detail = answers.map((a, i) => {
+    if (a === null) return `Q${i+1}:SKIP`;
+    return `Q${i+1}:${LABELS[a]}(${a === questions[i].ans ? '✓' : '✗'})`;
+  }).join(', ');
+
+  const payload = {
+    timestamp:   new Date().toISOString(),
+    name:        student.name,
+    matric:      student.matric,
+    phone:       student.phone,
+    department:  student.dept,
+    mode:        mode,
+    correct:     correct,
+    wrong:       wrong,
+    skipped:     skipped,
+    score_pct:   pct,
+    time_spent:  formatTime(elapsedSeconds),
+    answers:     detail
+  };
+
+  if (!SHEET_URL) {"https://script.google.com/macros/s/AKfycbyBneJ-dI4fv9b-O3vrFxxl6Vtqxnv_mF7ue5XhRHYOpLUT8fvPEHnNLc4RFZ12XxFbtA/exec"
+    statusEl.className = 'submit-status fail';
+    statusEl.textContent = '⚠️ No Apps Script URL set. Go to ⚙️ Setup in the menu.';
+    return;
+  }
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    statusEl.className = 'submit-status done';
+    statusEl.textContent = '✅ Results saved to Medicathrons records!';
+  } catch(e) {
+    statusEl.className = 'submit-status fail';
+    statusEl.textContent = '❌ Could not connect. Check your internet.';
+  }
+}
+
+// ════════════════════════════════════════════
+// ► UTILITIES
+// ════════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+
+function saveSetup() {
+  const url = document.getElementById('setup-url').value.trim();
+  const msg = document.getElementById('setup-msg');
+  if (!url || !url.startsWith('https://script.google.com')) {
+    msg.style.color = 'var(--red)';
+    msg.textContent = 'Please paste a valid Apps Script URL.';
+    return;
+  }
+  localStorage.setItem('phy103_sheet_url', url);
+  SHEET_URL = url;
+  msg.style.color = 'var(--green)';
+  msg.textContent = 'URL saved! Results will now go to your Google Sheet.';
+}
+
+function loadSetupUrl() {
+  const saved = localStorage.getItem('phy103_sheet_url') || '';
+  document.getElementById('setup-url').value = saved;
+  const msg = document.getElementById('setup-msg');
+  msg.textContent = saved ? 'URL already saved on this device.' : '';
+}
+
+function resetAll() {
+  answers = new Array(questions.length).fill(null);
+  correct = 0; wrong = 0; current = 0;
+  elapsedSeconds = 0;
+  show('reg-screen');
+}
+</script>
+</body>
+</html>
