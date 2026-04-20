@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PHY 103 — Standard Mock | Toppers Tutorial</title>
+<title>PHY 103 Standard Mock</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -382,10 +382,28 @@
   <p>Submitting your results...</p>
 </div>
 
+<!-- ══════════════ SETUP SCREEN ══════════════ -->
+<div id="setup-screen" class="screen">
+  <div class="logo-bar"><span class="logo-text">⚙️ Tutor Setup</span></div>
+  <div class="form-card" style="margin-top:20px;">
+    <div style="margin-bottom:20px;">
+      <div class="reg-tag" style="display:inline-block;margin-bottom:12px;">ONE-TIME SETUP</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;">Paste your Google Apps Script URL below. This saves on your device — only needs to be done once.</p>
+    </div>
+    <div class="form-group" style="margin-bottom:18px;">
+      <label>Apps Script Web App URL</label>
+      <input type="url" id="setup-url" placeholder="https://script.google.com/macros/s/..." style="font-size:12px;">
+    </div>
+    <div id="setup-msg" style="font-size:12px;margin-bottom:14px;min-height:18px;color:var(--green);"></div>
+    <button class="btn btn-primary" onclick="saveSetup()">SAVE URL ✓</button>
+    <button class="btn btn-outline" onclick="show('reg-screen')" style="margin-top:10px;width:100%;">← Back</button>
+  </div>
+</div>
+
 <!-- ══════════════ REGISTRATION SCREEN ══════════════ -->
 <div id="reg-screen" class="screen active">
   <div class="logo-bar">
-    <span class="logo-text">Medicathron's PHY103 class</span>
+    <span class="logo-text">Medicathron's PHY 103 Class</span>
   </div>
 
   <div class="reg-hero">
@@ -397,20 +415,20 @@
   <div class="info-strip">
     <div class="info-pill">Questions: <span>50</span></div>
     <div class="info-pill">Duration: <span>35 mins</span></div>
-    <div class="info-pill">Date: <span>18-04-2026</span></div>
+    <div class="info-pill">Date: <span id="live-date">--</span></div>
     <div class="info-pill">Mode: <span>Quiz / Flashcard</span></div>
   </div>
 
-  <div class="form-card">
+  <div class="form-card">to
     <div class="form-grid">
       <div class="form-group full">
         <label>Full Name</label>
-        <input type="text" id="f-name" placeholder="e.g. Adaeze Titilope Chimamanda" autocomplete="name">
+        <input type="text" id="f-name" placeholder="e.g. Adaeze Chisom Okafor" autocomplete="name">
         <span class="error-msg" id="err-name">Please enter your full name</span>
       </div>
       <div class="form-group">
         <label>Matric Number</label>
-        <input type="text" id="f-matric" placeholder="e.g. 221144" autocomplete="off">
+        <input type="text" id="f-matric" placeholder="e.g. 2023/5001" autocomplete="off">
         <span class="error-msg" id="err-matric">Required</span>
       </div>
       <div class="form-group">
@@ -432,6 +450,7 @@
       </div>
     </div>
     <button class="btn btn-primary" onclick="beginQuiz()">START EXAM →</button>
+    <button class="btn btn-outline" onclick="show('setup-screen');loadSetupUrl()" style="margin-top:10px;width:100%;font-size:12px;">⚙️ Tutor: Connect Google Sheet</button>
   </div>
 </div>
 
@@ -474,7 +493,7 @@
 <!-- ══════════════ RESULTS SCREEN ══════════════ -->
 <div id="results-screen" class="screen">
   <div class="logo-bar">
-    <span class="logo-text">Toppers Tutorial</span>
+    <span class="logo-text">Medicathron's PHY Class</span>
   </div>
 
   <div class="result-hero">
@@ -508,62 +527,62 @@
 // ════════════════════════════════════════════
 // ► CONFIGURATION — loaded from localStorage (set via setup screen)
 // ════════════════════════════════════════════
-let SHEET_URL = localStorage.getItem('phy103_sheet_url') || "";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyBneJ-dI4fv9b-O3vrFxxl6Vtqxnv_mF7ue5XhRHYOpLUT8fvPEHnNLc4RFZ12XxFbtA/exec";
 
 // ════════════════════════════════════════════
 // ► QUESTIONS DATA
 // ════════════════════════════════════════════
 const questions = [
-  { q: "Two containers of gas are connected to a third container acting as a thermometer. After a long time, all three show the same temperature reading. Which fundamental law of thermodynamics does this demonstrate?", opts: ["A and B have different temperatures", "A and B are in thermal equilibrium with each other", "Heat flows from C to both A and B simultaneously", "The internal energy of C is zero"], ans: 1 },
-  { q: "A student lists four statements about temperature scales:\nI) The ice point is 273.15 K on the Kelvin scale.\nII) The triple point of water is 273.16 K.\nIII) The Fahrenheit steam point is 212°F.\nIV) A temperature difference of 45°C equals a difference of 81°F.\nHow many of these statements are correct?", opts: ["I and II only", "I, II and III only", "I, II, III and IV", "II and IV only"], ans: 2 },
-  { q: "A hot iron rod is placed near a cold metal block but they are not touching. Will heat transfer occur between them?", opts: ["Yes, because they are made of metal", "No, because they are at different temperatures", "No, because they are not in thermal contact", "Yes, because of atmospheric pressure"], ans: 2 },
-  { q: "A thermometer is used to confirm that two objects have the same temperature without placing them directly in contact with each other. This procedure is a practical demonstration of which law?", opts: ["Zeroth Law of Thermodynamics", "Second Law of Thermodynamics", "First Law of Thermodynamics", "Third Law of Thermodynamics"], ans: 0 },
-  { q: "A nurse records a patient\'s temperature as 32°F. What is this temperature on the Celsius scale?", opts: ["0°C", "32°C", "23°F", "212°F"], ans: 0 },
-  { q: "A scientist notices that the ice point and the triple point of water are not exactly the same value. What is the PRIMARY reason for this small but important difference?", opts: ["Differences in the chemical type of water used", "The effect of atmospheric pressure and dissolved air on the ice point", "Changes in boiling points at different altitudes", "Inaccuracies in the thermometers used"], ans: 1 },
-  { q: "Refrigerator B is kept exactly 45°F warmer than Refrigerator A. If you were to measure this same gap using the Celsius scale, what would it be?", opts: ["25°C", "7.2°C", "8.1°C", "81°C"], ans: 0 },
-  { q: "A biological sample storage unit is maintained at 253 K. A technician records this in Celsius. What is the correct value?", opts: ["-20°C", "-26.15°C", "-253°C", "20°C"], ans: 0 },
-  { q: "Physicists describe Absolute Zero as a fundamental limit rather than just a very cold temperature. Which statement correctly describes what happens at 0 K?", opts: ["All kinetic and vibrational molecular motion ceases according to classical mechanics", "The volume and pressure of a mathematically ideal gas would extrapolate to zero", "All known substances transition into a crystalline solid", "The internal energy of a system reaches its maximum possible entropy"], ans: 1 },
-  { q: "A student lists properties of various thermometers. Which of the following is the thermometric property exploited by a liquid-in-glass thermometer?", opts: ["The pressure of the liquid", "The electrical resistance of the glass", "The volume/length of the liquid column", "The spectral emissivity of the glass"], ans: 2 },
-  { q: "A laboratory technician needs a thermometer that can measure up to 300°C reliably. Which of the following thermometers is most appropriate?", opts: ["-200°C to 1000°C (platinum resistance)", "-80°C to 70°C (alcohol)", "-270°C to 2000°C (gas)", "-35°C to 350°C (mercury-in-glass)"], ans: 3 },
-  { q: "A physicist needs to measure the temperature at a very tiny spot on a microchip. Which thermometer is best suited for this because of its very small sensing element?", opts: ["Constant-volume gas thermometer", "Liquid-in-glass thermometer", "Thermoelectric thermometer", "Mercury thermometer"], ans: 2 },
-  { q: "An engineer needs to monitor temperature changes that happen within fractions of a second in an engine. Which thermometer would be LEAST suitable for this purpose?", opts: ["Constant-volume gas thermometer", "Thermoelectric thermometer", "Thermocouple", "Resistance thermometer"], ans: 0 },
-  { q: "A researcher working with superconducting materials needs to measure temperatures close to absolute zero. Which thermometer covers this extreme range?", opts: ["-35°C to 350°C", "-80°C to 70°C", "-270°C to 1500°C", "0°C to 100°C"], ans: 2 },
-  { q: "A metallurgist needs a precise thermometer capable of measuring both very low and very high temperatures in a furnace environment. Which best fits the range -200°C to 1000°C?", opts: ["Platinum resistance thermometer", "Alcohol-in-glass thermometer", "Constant-volume gas thermometer", "Mercury-in-glass thermometer"], ans: 0 },
-  { q: "A structural steel rail has an initial length of 30.00 m at 0°C. Given α = 11 × 10⁻⁶ °C⁻¹, what is the final length when temperature reaches 40°C?", opts: ["30.013 m", "30.130 m", "29.987 m", "30.044 m"], ans: 0 },
-  { q: "A sealed rigid metal container holds a fixed amount of gas. A flame is applied beneath it. Which property of the gas changes and serves as the thermometric indicator in a constant-volume gas thermometer?", opts: ["Length of gas column", "Volume of gas", "Pressure of the gas", "Density of the gas"], ans: 2 },
-  { q: "Two bolts (steel: L=10 mm, α=11×10⁻⁶; brass: L=30 mm, α=19×10⁻⁶) have a 5 µm gap at 27°C. They will touch when ΔT ≈", opts: ["3.7°C", "34.4°C", "19.6°C", "7.4°C"], ans: 0 },
-  { q: "A gas system at constant pressure of 1000 Pa performs 20 kJ of work during isobaric expansion. If the initial volume was 8 m³, what is the final volume?", opts: ["12 m³", "18 m³", "20 m³", "28 m³"], ans: 3 },
-  { q: "A constant-volume gas thermometer is calibrated at −80°C (P = 0.900 atm) and 78°C (P = 1.635 atm). The Celsius value of absolute zero this yields is approximately ________", opts: ["-270°C", "-273.8°C", "-273.15°C", "-300°C"], ans: 1 },
-  { q: "A block of ice is placed on a hot plate. A temperature probe records the temperature every second. What pattern will be observed during the melting process?", opts: ["Temperature rises rapidly throughout", "Temperature drops slightly then rises", "Temperature stays constant until all ice has melted", "Temperature first rises then drops back down"], ans: 2 },
-  { q: "A 0.05 kg metal ingot heated to 200°C is dropped into 0.400 kg of water at 20°C, reaching equilibrium at 22.4°C (c_water = 4186 J kg⁻¹ °C⁻¹). The specific heat of the metal is approximately _______", opts: ["125 J kg⁻¹ K⁻¹", "253 J kg⁻¹ K⁻¹", "453 J kg⁻¹ K⁻¹", "837 J kg⁻¹ K⁻¹"], ans: 2 },
-  { q: "Two materials X and Y receive the same amount of heat energy. Material X shows a large temperature rise while material Y barely changes temperature. What can you conclude?", opts: ["X has higher specific heat capacity than Y", "Y has higher specific heat capacity than X", "X conducts heat more efficiently than Y", "Y has a higher latent heat than X"], ans: 1 },
-  { q: "Water boils at 100°C, yet steam burns are far more dangerous than burns from boiling water at the same temperature. Which thermodynamic concept best explains this?", opts: ["Steam has lower internal energy than water", "Solid-to-liquid transition requires more energy than liquid-to-gas", "Fusion occurs at a much higher temperature threshold", "Vaporization requires molecules to fully overcome intermolecular forces, storing enormous extra energy"], ans: 3 },
-  { q: "Liquid flows through a heated tube at 0.150 kg/min (25 W, ΔT=2.2°C); then 0.2318 kg/min (37.8 W, same ΔT). Specific heat of the liquid?", opts: ["2100 J kg⁻¹ K⁻¹", "3600 J kg⁻¹ K⁻¹", "4200 J kg⁻¹ K⁻¹", "4800 J kg⁻¹ K⁻¹"], ans: 2 },
-  { q: "From the same tube experiment above, the rate of heat loss from the tube is:", opts: ["0.9 W", "2.1 W", "3.5 W", "5.0 W"], ans: 2 },
-  { q: "A textbook defines internal energy as the total microscopic energy of a system. A student argues that a moving train has high internal energy because it is moving fast. Is the student correct?", opts: ["Yes, translational motion adds to internal energy", "Yes, the vibration of train parts counts", "No, internal energy excludes the bulk kinetic energy of the whole system", "No, only potential energy is excluded"], ans: 2 },
-  { q: "A heat engine completes one full cycle and returns exactly to its starting state. A technician measures the heat added and work output. What relationship must hold?", opts: ["Q = -W", "Q = 0", "W = 0", "Q = W"], ans: 3 },
-  { q: "A system experiences a decrease in internal energy of 500 J. If 200 J of work is performed ON the system by the surroundings, the resulting heat transfer (Q) is ______", opts: ["Q = -300 J", "Q = +300 J", "Q = -700 J", "Q = +700 J"], ans: 2 },
-  { q: "An industrial gas piston is compressed from 9.0 m³ to 2.0 m³ at constant pressure of 0.8 atm. How much work did the gas do?", opts: ["-5.66 × 10⁵ J", "+5.66 × 10⁵ J", "-5.66 × 10⁴ J", "+5.66 × 10⁴ J"], ans: 0 },
-  { q: "During the same compression above, the gas lost 400 J of heat through the cylinder walls. What is the change in internal energy ΔEint of the gas?", opts: ["-4.0 × 10² J", "+5.65 × 10⁵ J", "-5.66 × 10⁵ J", "-6.06 × 10⁵ J"], ans: 1 },
-  { q: "2500 J of heat is added to 2 moles of an ideal monoatomic gas (initially at 300 K) while the gas performs 5000 J of work. What is the change in internal energy?", opts: ["-7500 J", "-2500 J", "2500 J", "7500 J"], ans: 1 },
-  { q: "An X-ray tube fires 10¹⁸ electrons/s at 2×10⁶ m/s at a tungsten target (m=0.2 kg, c=500 J kg⁻¹ K⁻¹). Only 98% of electron KE converts to heat. How long for a 50°C temperature rise?", opts: ["1870 s", "1500 s", "2780 s", "5210 s"], ans: 0 },
-  { q: "A perfectly insulated balloon filled with ideal gas is allowed to expand freely. Which statement correctly describes the outcome?", opts: ["Temperature rises as molecules speed up", "Temperature drops and internal energy decreases", "Temperature stays the same, internal energy unchanged", "Pressure rises as volume increases"], ans: 1 },
-  { q: "1 mole of ideal gas expands isothermally at 273 K from 3.0 L to 10.0 L. Work done by the gas?", opts: ["2370 J", "3720 J", "7320 J", "2730 J"], ans: 3 },
-  { q: "Two students debate whether the work done by a gas depends only on its start and end states. One says the path matters too. Who is correct, and why?", opts: ["Only the initial and final states matter — work is a state function", "Only the path matters — states are irrelevant", "Only initial and final states matter, path is irrelevant", "Both the initial/final states AND the path taken determine the work done"], ans: 3 },
-  { q: "A thermodynamics exam question asks students to identify which quantity is NOT a state variable of a system. Which answer is correct?", opts: ["Pressure, P", "Volume, V", "Temperature, T", "Heat, Q"], ans: 3 },
-  { q: "During a process, a gas expands and does work, yet its temperature does not change at all. No internal energy accumulates. Which thermodynamic process fits this description perfectly?", opts: ["Adiabatic", "Isochoric", "Isobaric", "Isothermal"], ans: 3 },
-  { q: "Using the kinetic theory expression P = ⅓(N/V)μ², which single change would cause gas pressure to increase while all other factors remain constant?", opts: ["Increasing the number of molecules per unit volume", "Decreasing the mean square speed of molecules", "Increasing the size of the container", "Cooling the gas to a lower absolute temperature"], ans: 0 },
-  { q: "The average translational kinetic energy per molecule of an ideal gas equals:", opts: ["½kᵦT", "kᵦT", "3/2 kᵦT", "3kᵦT"], ans: 2 },
-  { q: "A tank (0.3 m³) holds 2.0 mol of helium at 20°C. The total translational kinetic energy of the gas molecules is approximately _____", opts: ["3.65 × 10³ J", "7.30 × 10³ J", "1.46 × 10⁴ J", "2.19 × 10⁴ J"], ans: 1 },
-  { q: "A student asks: \'If I heat a gas at constant pressure and at constant volume by the same amount, why does the constant-pressure case need more heat?\' What is the correct explanation?", opts: ["At constant pressure the gas expands and must do work, requiring extra energy input", "Less heat is needed at constant pressure than constant volume", "The temperature change is smaller at constant pressure", "Internal energy changes more at constant volume"], ans: 0 },
-  { q: "One mole of an ideal monoatomic gas at 300 K gains 500 J of heat at constant volume. What is the new temperature?", opts: ["320 K", "310 K", "360 K", "340 K"], ans: 3 },
-  { q: "For a monoatomic ideal gas, the ratio of work done to heat added during an isobaric process is:", opts: ["1/3", "2/5", "2/3", "5/7"], ans: 1 },
-  { q: "Which equation correctly expresses the relationship between temperature and volume during an adiabatic process?", opts: ["TV = constant", "TV^(1-γ) = constant", "TV^(γ−1) = constant", "T^γV = constant"], ans: 2 },
-  { q: "Two moles of ideal gas (γ=1.40) expand adiabatically from Pᵢ=5.00 atm, Vᵢ=12.0 L to Vf=30.0 L. The final pressure Pf is approximately:", opts: ["0.77 atm", "1.39 atm", "2.50 atm", "3.15 atm"], ans: 1 },
-  { q: "A physics student ranks four thermodynamic processes by how much work the gas does during expansion (same initial state and same volume change). What is the correct order from least to most work?", opts: ["Isochoric < Isothermal < Isobaric < Adiabatic", "Isothermal < Adiabatic < Isobaric < Isochoric", "Isobaric < Isothermal < Adiabatic < Isochoric", "Isochoric = 0 < Adiabatic < Isothermal < Isobaric"], ans: 3 },
-  { q: "A student claims that heat and work are both state functions because they transfer energy. Why is this claim incorrect?", opts: ["Heat and work both depend on path, not just initial and final states", "Only heat is path-dependent; work is a state function", "Their difference — internal energy — is path-independent, but Q and W individually are not", "The sum of heat and work always equals zero"], ans: 2 },
-  { q: "For a monoatomic ideal gas (2 moles, 300 K): 2500 J of heat is supplied while the gas does 5000 J of work on surroundings. What is the closest value of the final internal energy of the gas?", opts: ["2500 J", "4986 J", "7486 J", "9970 J"], ans: 1 },
-  { q: "A metrologist needs to calibrate a new digital resistance thermometer in the laboratory. Which thermometer should be used as the primary standard reference?", opts: ["Alcohol-in-glass thermometer", "Mercury-in-glass thermometer", "Constant-volume gas thermometer", "Thermocouple"], ans: 2 }
+  { q: "A copper rod is placed in contact with both a glass beaker and an aluminium block. After sufficient time, all three objects show the same thermometer reading. Which law of thermodynamics is illustrated by this observation?", opts: ["The glass and aluminium have unequal internal energies", "The glass and aluminium are in thermal equilibrium with each other", "Heat flows from the copper rod to both objects simultaneously", "The internal energy of the copper rod is zero"], ans: 1 },
+  { q: "Examine the following statements about temperature scales:\nI) The ice point corresponds to 273.15 K on the Kelvin scale.\nII) The triple point of water is defined as exactly 273.16 K.\nIII) The normal boiling point of water is 212°F on the Fahrenheit scale.\nIV) A temperature interval of 36°C is equivalent to an interval of 64.8°F.\nWhich statements are ALL correct?", opts: ["I and III only", "I, II and III only", "I, II, III and IV", "II and IV only"], ans: 2 },
+  { q: "A student places a thermometer probe near a hot surface without touching it and notices no temperature change in the probe. What condition is necessary for heat exchange to occur between two objects?", opts: ["They must be made of the same material", "They must be at the same pressure", "They must be in thermal contact", "They must be at the same temperature"], ans: 2 },
+  { q: "In a quality-control lab, a single liquid thermometer is used to verify that two separate chemical baths are at the same temperature without placing the baths in contact. Which law justifies this procedure?", opts: ["Zeroth Law of Thermodynamics", "Second Law of Thermodynamics", "First Law of Thermodynamics", "Third Law of Thermodynamics"], ans: 0 },
+  { q: "A weather station records an outdoor temperature of 59°F. What is this temperature on the Celsius scale?", opts: ["15°C", "32°C", "27°C", "20°C"], ans: 0 },
+  { q: "In precise thermometry, scientists use the triple point of water rather than the ice point as a fixed reference. What is the fundamental reason for this preference?", opts: ["The triple point occurs at a higher temperature", "The ice point is affected by dissolved air and atmospheric pressure, making it less reproducible", "The triple point is easier to achieve in a standard laboratory", "The ice point varies with the purity of ice used"], ans: 1 },
+  { q: "A deep freezer used in a pharmaceutical company operates at a temperature that is 63°F below room temperature (77°F). Express the operating temperature of the freezer in degrees Celsius.", opts: ["-7.8°C", "-10°C", "-12.2°C", "-17.2°C"], ans: 0 },
+  { q: "A cryogenic storage unit for biological specimens is maintained at 243 K. A lab report requires this value in Celsius. What should the technician record?", opts: ["-30°C", "-26°C", "-243°C", "30°C"], ans: 0 },
+  { q: "During a lecture on extreme physics, a professor describes Absolute Zero as more than just a very cold temperature. Which statement most accurately describes the significance of 0 K?", opts: ["All molecular motion including vibration completely stops in all theories", "An ideal gas would mathematically extrapolate to zero pressure and volume", "All matter transitions from liquid to solid crystalline form", "A system achieves maximum entropy at this point"], ans: 1 },
+  { q: "Which physical property of the sensing medium is directly exploited as the thermometric property in a liquid-in-glass thermometer?", opts: ["Pressure exerted by the liquid on the glass walls", "Electrical resistance of the glass capillary", "Thermal expansion — the change in volume or length of the liquid column", "Infrared emission spectrum of the liquid"], ans: 2 },
+  { q: "A food processing plant needs a thermometer to monitor cooking oil temperatures reaching up to 280°C. Which thermometer type covers this range adequately?", opts: ["Alcohol-in-glass thermometer (-80°C to 70°C)", "Constant-volume gas thermometer (-270°C to 1500°C)", "Mercury-in-glass thermometer (-35°C to 350°C)", "Platinum resistance thermometer (-200°C to 1000°C)"], ans: 2 },
+  { q: "A biomedical engineer wants to measure the temperature of a tiny junction on a circuit board that is only 0.5 mm wide. Which thermometer is best suited because of its miniature sensing element?", opts: ["Constant-volume gas thermometer", "Mercury-in-glass thermometer", "Thermoelectric (thermocouple) thermometer", "Alcohol-in-glass thermometer"], ans: 2 },
+  { q: "A combustion engineer needs to record temperature fluctuations in a jet engine that change every millisecond. Which thermometer would be completely inadequate for this task?", opts: ["Thermocouple", "Thermoelectric thermometer", "Resistance thermometer", "Constant-volume gas thermometer"], ans: 3 },
+  { q: "A researcher studying liquid helium near absolute zero needs a thermometer with a range starting below -260°C. Which thermometer is the only suitable option?", opts: ["-35°C to 350°C", "-80°C to 70°C", "-270°C to 1500°C", "0°C to 100°C"], ans: 2 },
+  { q: "An industrial furnace operator requires a thermometer that can measure both sub-zero storage temperatures and high-temperature furnace conditions up to 900°C. Which thermometer fits this wide range?", opts: ["Platinum resistance thermometer (-200°C to 1000°C)", "Alcohol-in-glass thermometer (-80°C to 70°C)", "Mercury-in-glass thermometer (-35°C to 350°C)", "Constant-volume gas thermometer (-270°C to 1500°C)"], ans: 0 },
+  { q: "A concrete bridge deck has a length of 45.00 m at 0°C. If the linear expansion coefficient for concrete is α = 12 × 10⁻⁶ °C⁻¹, what is the length of the bridge deck when the temperature rises to 35°C?", opts: ["45.0189 m", "45.189 m", "44.981 m", "45.054 m"], ans: 0 },
+  { q: "A fixed amount of gas is sealed inside a rigid steel cylinder. When the cylinder is placed in sunlight and its temperature rises, which property of the gas changes and is used as the thermometric indicator?", opts: ["The length of the gas column", "The volume of the gas", "The pressure of the gas", "The density of the gas"], ans: 2 },
+  { q: "Two railway rails are laid end to end — one copper (L = 15 mm, α = 17 × 10⁻⁶ °C⁻¹) and one steel (L = 25 mm, α = 11 × 10⁻⁶ °C⁻¹) — with a 6 µm expansion gap between them at 20°C. At approximately what temperature rise ΔT will the two rails just make contact?", opts: ["ΔT ≈ 14.5°C", "ΔT ≈ 9.2°C", "ΔT ≈ 17.1°C", "ΔT ≈ 6.3°C"], ans: 0 },
+  { q: "A gas cylinder at a constant pressure of 1200 Pa expands isobarically, performing 36 kJ of work on its surroundings. If the initial volume of the gas was 5 m³, what is its final volume?", opts: ["25 m³", "30 m³", "35 m³", "40 m³"], ans: 2 },
+  { q: "A constant-volume gas thermometer is calibrated using two fixed points: at -60°C the pressure reads 0.820 atm, and at 100°C the pressure reads 1.660 atm. Using linear extrapolation, what Celsius temperature does this thermometer assign to absolute zero?", opts: ["-270°C", "-274.3°C", "-273.15°C", "-260°C"], ans: 1 },
+  { q: "A beaker of water is being heated steadily on a hot plate. At a certain point, despite continuous heating, the thermometer reading stops changing for several minutes before the water disappears. What thermodynamic principle explains this observation?", opts: ["The hot plate is losing power gradually", "Temperature always increases when heat is added", "During a phase change, absorbed heat increases potential energy not temperature", "Water has infinite specific heat capacity at boiling point"], ans: 2 },
+  { q: "A 0.08 kg metal sample heated to 250°C is dropped into 0.500 kg of water initially at 18°C. The system reaches thermal equilibrium at 21.6°C. Given c_water = 4186 J kg⁻¹ °C⁻¹, what is the specific heat capacity of the metal?", opts: ["128 J kg⁻¹ K⁻¹", "256 J kg⁻¹ K⁻¹", "412 J kg⁻¹ K⁻¹", "524 J kg⁻¹ K⁻¹"], ans: 2 },
+  { q: "Substance P and Substance Q each absorb 500 J of heat. Substance P rises in temperature by 2°C while Substance Q rises by 10°C (both have equal mass). What can be correctly concluded?", opts: ["P has a lower specific heat capacity than Q", "Q has a higher specific heat capacity than P", "P has a higher specific heat capacity than Q", "Both substances have the same specific heat capacity"], ans: 2 },
+  { q: "A nurse spills both boiling water (100°C) and steam (also 100°C) on her hands. She reports that the steam burn is far more severe. Which thermodynamic concept best accounts for the greater danger of steam at the same temperature?", opts: ["Steam has a much lower density and spreads over a larger area", "The latent heat of vaporization means steam carries far more energy per kilogram than boiling water", "Steam has a higher specific heat capacity than liquid water", "The boiling process increases the pressure of steam above atmospheric"], ans: 1 },
+  { q: "A liquid flows through an electrically heated tube. In trial 1: flow rate = 0.120 kg/min, heater power = 20 W, temperature rise = 2.5°C. In trial 2: flow rate = 0.1848 kg/min, heater power = 30.2 W, same temperature rise of 2.5°C. Calculate the specific heat capacity of the liquid.", opts: ["2100 J kg⁻¹ K⁻¹", "3600 J kg⁻¹ K⁻¹", "4200 J kg⁻¹ K⁻¹", "4800 J kg⁻¹ K⁻¹"], ans: 2 },
+  { q: "Using the data from the tube flow experiment above, calculate the rate of heat loss from the tube to the surroundings.", opts: ["0.7 W", "1.8 W", "3.1 W", "4.4 W"], ans: 0 },
+  { q: "A physics professor asks students to identify which energy form is NOT included in the internal energy of a gas sample. A student answers: 'the kinetic energy of the whole gas cylinder moving on a conveyor belt.' Is this student correct, and why?", opts: ["Incorrect — bulk motion KE is part of internal energy", "Incorrect — only rotational energy is excluded", "Correct — internal energy excludes the macroscopic bulk kinetic energy of the system as a whole", "Correct — internal energy only includes potential energy terms"], ans: 2 },
+  { q: "A steam turbine completes one full operating cycle, returning the working fluid to its exact initial thermodynamic state. The turbine receives heat Q_in and produces work W_out. Which relationship must be true?", opts: ["Q = -W", "Q = 0", "W = 0", "Q = W"], ans: 3 },
+  { q: "During an experiment, a gas releases 800 J of heat to its surroundings while the surroundings simultaneously perform 350 J of work on the gas. What is the net change in internal energy of the gas?", opts: ["ΔU = -450 J", "ΔU = +450 J", "ΔU = -1150 J", "ΔU = +1150 J"], ans: 0 },
+  { q: "An engineer compresses a gas in a piston from an initial volume of 12.0 m³ to a final volume of 3.0 m³ at a constant pressure of 1.2 atm. How much work does the gas do during this compression?", opts: ["-1.094 × 10⁶ J", "+1.094 × 10⁶ J", "-1.094 × 10⁵ J", "+1.094 × 10⁵ J"], ans: 0 },
+  { q: "During the compression described above, a thermal sensor records that the gas absorbs 600 J of heat from the surroundings through the hot cylinder walls. What is the change in internal energy of the gas?", opts: ["-6.0 × 10² J", "+1.094 × 10⁶ J", "+1.093 × 10⁶ J", "-1.093 × 10⁶ J"], ans: 2 },
+  { q: "A researcher supplies 3500 J of heat to 2 moles of an ideal monoatomic gas initially at 280 K. During this process, the gas expands and does 6000 J of work on its surroundings. What is the change in internal energy of the gas?", opts: ["-9500 J", "-2500 J", "2500 J", "9500 J"], ans: 1 },
+  { q: "A dental X-ray machine fires 2 × 10¹⁸ electrons per second, each with a speed of 3 × 10⁶ m/s, at a tungsten anode of mass 0.25 kg and specific heat 500 J kg⁻¹ K⁻¹. Only 99% of the electron kinetic energy converts to heat. How long does it take for the anode temperature to rise by 40°C?", opts: ["556 s", "763 s", "1021 s", "1248 s"], ans: 0 },
+  { q: "A thermally insulated rubber balloon is stretched slowly, allowing the trapped air to expand. No heat enters or leaves the balloon. What happens to the temperature and internal energy of the air inside?", opts: ["Both temperature and internal energy increase", "Both temperature and internal energy decrease", "Temperature stays constant while internal energy decreases", "Pressure increases as volume increases"], ans: 1 },
+  { q: "Two moles of an ideal gas expand isothermally at 27°C (300 K) from an initial volume of 4.0 L to a final volume of 15.0 L. Calculate the work done by the gas during this expansion.", opts: ["3362 J", "4152 J", "5020 J", "6724 J"], ans: 0 },
+  { q: "On a PV diagram, a gas is taken from state A to state B by two different paths — one curved and one straight. A student claims the work done is the same for both paths since the endpoints are identical. Is the student correct?", opts: ["Yes — work depends only on initial and final states", "Yes — only the path matters, not the endpoints", "No — work depends only on the initial and final states", "No — work depends on both the endpoints AND the path taken between them"], ans: 3 },
+  { q: "A student is asked to list all state variables of a thermodynamic system. Which quantity in the list below does NOT qualify as a state variable?", opts: ["Pressure P", "Volume V", "Temperature T", "Heat Q"], ans: 3 },
+  { q: "An ideal gas expands inside a cylinder, pushing the piston outward and doing work. A precise thermometer embedded in the cylinder wall shows absolutely no temperature change throughout the entire process. Identify the thermodynamic process.", opts: ["Adiabatic process", "Isochoric process", "Isobaric process", "Isothermal process"], ans: 3 },
+  { q: "The kinetic theory gives gas pressure as P = ⅓(N/V)μ². A chemist wants to increase the pressure inside a reaction vessel without changing its volume or temperature. What is the most direct way to achieve this?", opts: ["Increase the number of gas molecules in the vessel", "Decrease the average speed of the molecules", "Expand the volume of the vessel", "Lower the absolute temperature of the gas"], ans: 0 },
+  { q: "Which expression correctly gives the average translational kinetic energy of a single molecule in an ideal gas at absolute temperature T?", opts: ["½kᵦT", "kᵦT", "3/2 kᵦT", "3kᵦT"], ans: 2 },
+  { q: "A rigid vessel of volume 0.5 m³ contains 3.0 mol of neon gas at 25°C. What is the total translational kinetic energy of all the gas molecules?", opts: ["5.56 × 10³ J", "1.11 × 10⁴ J", "2.22 × 10⁴ J", "3.33 × 10⁴ J"], ans: 0 },
+  { q: "A student heats 1 mole of an ideal gas first at constant volume and then at constant pressure, supplying the same amount of heat in each case. In which case does the temperature rise more, and why?", opts: ["Constant pressure — because no work is done", "Constant pressure — because the gas expands and does work, so less energy goes into raising temperature, meaning constant volume gives a larger ΔT", "Constant volume — because the gas must do extra work at constant pressure, so more heat is needed per degree of temperature rise", "Both cases produce the same temperature rise"], ans: 2 },
+  { q: "One mole of an ideal monoatomic gas at 290 K absorbs 750 J of heat at constant volume. What is the approximate final temperature of the gas?", opts: ["310 K", "320 K", "350 K", "360 K"], ans: 3 },
+  { q: "For a diatomic ideal gas undergoing an isobaric process, the ratio of work done by the gas to the total heat supplied is:", opts: ["1/3", "2/7", "2/5", "5/7"], ans: 2 },
+  { q: "A physics textbook states that for an adiabatic process involving an ideal gas, temperature and volume are related by a specific equation. Which of the following correctly expresses this relationship?", opts: ["TV = constant", "TV^(1−γ) = constant", "TV^(γ−1) = constant", "T^γ · V = constant"], ans: 2 },
+  { q: "Three moles of an ideal gas with γ = 1.40 undergo adiabatic expansion from an initial state of Pᵢ = 4.00 atm and Vᵢ = 10.0 L to a final volume of Vf = 28.0 L. What is the approximate final pressure?", opts: ["0.84 atm", "1.07 atm", "2.10 atm", "3.20 atm"], ans: 0 },
+  { q: "A thermodynamics lecturer draws four processes on a PV diagram — all starting from the same state and ending at the same final volume. She asks students to rank them by work done by the gas. What is the correct ranking from least to most work?", opts: ["Isochoric < Isothermal < Isobaric < Adiabatic", "Isothermal < Adiabatic < Isobaric < Isochoric", "Isobaric < Isothermal < Adiabatic < Isochoric", "Isochoric (zero) < Adiabatic < Isothermal < Isobaric"], ans: 3 },
+  { q: "Two engineering students debate the nature of heat and work. Student A says both are state functions. Student B says neither is a state function. Who is correct, and what is the best justification?", opts: ["Student A — both Q and W depend only on initial and final states", "Student B — both Q and W depend on the path taken, not just the endpoints", "Neither — Q is a state function but W is not", "Neither — W is a state function but Q is not"], ans: 1 },
+  { q: "Three moles of a monoatomic ideal gas are initially at 320 K. A total of 3000 J of heat is supplied to the gas while it performs 5500 J of work on its surroundings. What is the final internal energy of the gas, given that the initial internal energy is ½ × nRT × degrees of freedom?", opts: ["2488 J", "5488 J", "7988 J", "11988 J"], ans: 1 },
+  { q: "A national standards laboratory needs to calibrate a set of newly manufactured digital thermometers. Which thermometer should be used as the primary reference standard for this calibration?", opts: ["Alcohol-in-glass thermometer", "Mercury-in-glass thermometer", "Constant-volume gas thermometer", "Thermocouple thermometer"], ans: 2 }
 ];
 
 // ════════════════════════════════════════════
@@ -772,7 +791,7 @@ function finishQuiz() {
 async function submitToSheet(pct, skipped) {
   const statusEl = document.getElementById('submit-status');
   statusEl.className = 'submit-status sending';
-  statusEl.textContent = '⏳ Sending results to Medicathron right now...';
+  statusEl.textContent = '⏳ Sending results to Toppers Tutorial records...';
 
   // Build per-question detail string
   const detail = answers.map((a, i) => {
@@ -795,11 +814,7 @@ async function submitToSheet(pct, skipped) {
     answers:     detail
   };
 
-  if (!SHEET_URL) {"https://script.google.com/macros/s/AKfycbyBneJ-dI4fv9b-O3vrFxxl6Vtqxnv_mF7ue5XhRHYOpLUT8fvPEHnNLc4RFZ12XxFbtA/exec"
-    statusEl.className = 'submit-status fail';
-    statusEl.textContent = '⚠️ No Apps Script URL set. Go to ⚙️ Setup in the menu.';
-    return;
-  }
+
 
   try {
     await fetch(SHEET_URL, {
@@ -809,10 +824,10 @@ async function submitToSheet(pct, skipped) {
       body: JSON.stringify(payload)
     });
     statusEl.className = 'submit-status done';
-    statusEl.textContent = '✅ Results saved to Medicathrons records!';
+    statusEl.textContent = '✅ Results saved to Toppers Tutorial records!';
   } catch(e) {
     statusEl.className = 'submit-status fail';
-    statusEl.textContent = '❌ Could not connect. Check your internet.';
+    statusEl.textContent = '❌ Could not connect. Check your internet and Apps Script URL.';
   }
 }
 
@@ -853,6 +868,18 @@ function resetAll() {
   elapsedSeconds = 0;
   show('reg-screen');
 }
+
+// ── Live date ──
+(function() {
+  const el = document.getElementById('live-date');
+  if (el) {
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2,'0');
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const yyyy = now.getFullYear();
+    el.textContent = dd + '-' + mm + '-' + yyyy;
+  }
+})();
 </script>
 </body>
 </html>
